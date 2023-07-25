@@ -7,6 +7,8 @@ var db = Promise.promisifyAll(require('../lib/db'));
 var addNewUserToDatabaseAsync = function(user) {
   // The outermost `return` lets us continue the chain
   // after an invocation of `addNewUserToDatabaseAsync`
+  // promise.then()
+  // promise.catch()
   return db.findUserInDatabaseAsync(user)
     .then(function(existingUser) {
       if (existingUser) {

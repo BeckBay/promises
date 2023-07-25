@@ -14,7 +14,46 @@ var Promise = require('bluebird');
 
 
 var fetchProfileAndWriteToFile = function(readFilePath, writeFilePath) {
-  // TODO
+  return new Promise(function(resolve, reject) {
+    fs.readFile(readFilePath, 'utf8', function(err, data) {
+      if(err) {
+        reject(err);
+      } else {
+        var username = data.trim();
+        var options = {
+          hostname: 'api.github.com',
+          path: '/users/' + username,
+          method: 'GET',
+          headers: {
+            'User-Agent': 'MyApp'
+          }
+        };
+        var req = https.request(options, function (response) {
+          var responseData = '';
+
+          response.on('data', function (chunk) {
+            responseData += chunk;
+          });
+          response.on('end', function () {
+
+            fs.writeFile(writeFilePath, JSON.stringify(JSON.parse(responseData), null, 2), function (err) {
+              if (err) {
+                reject(err);
+              } else {
+                resolve('Profile data written successfully to ' + writeFilePath);
+              }
+            });
+          });
+        });
+
+        req.on('error', function (error) {
+          reject(error);
+        });
+
+        req.end();
+      }
+    });
+  });
 };
 
 // Export these functions so we can test them
